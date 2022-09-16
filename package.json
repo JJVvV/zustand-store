@@ -1,0 +1,47 @@
+{
+  "name": "zustand-store",
+  "version": "0.0.1",
+  "description": "zustand store",
+  "main": "dist/index.js",
+  "bin": {
+    "yl": "./build/src/index.js",
+    "yunlu": "./build/src/index.js",
+    "cloudlu": "./build/src/index.js"
+  },
+  "scripts": {
+    "start": "node build/src/index.js",
+    "clean": "rimraf coverage build tmp",
+    "prebuild": "yarn run lint",
+    "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -w -p tsconfig.json",
+    "build:release": "yarn run clean && tsc -p tsconfig.release.json",
+    "lint": "eslint . --ext .ts --ext .mts",
+    "test": "jest --coverage",
+    "prettier": "prettier --config .prettierrc --write . --ignore-path .prettierignore",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "@types/jest": "~27.5",
+    "@types/node": "~16",
+    "@typescript-eslint/eslint-plugin": "~5.26",
+    "@typescript-eslint/parser": "~5.26",
+    "eslint": "~8.16",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-jest": "~26.2",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "~28.1",
+    "prettier": "^2.7.1",
+    "ts-jest": "~28.0",
+    "tsutils": "~3.21",
+    "typescript": "~4.7"
+  },
+  "author": "yunlu frontend",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "immer": "^9.0.15",
+    "zustand": "^4.1.1"
+  },
+  "volta": {
+    "node": "16.13.0"
+  }
+}

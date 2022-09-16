@@ -1,0 +1,14 @@
+src
+.vscode
+__tests__
+node_modules
+.editorconfig
+.eslintignore
+.eslintrc.js
+.gitignore
+.npmignore
+.prettierrc
+jest.config.js
+tsconfig.json
+tsconfig.release.json
+yarn.lock
