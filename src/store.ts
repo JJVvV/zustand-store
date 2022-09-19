@@ -40,6 +40,7 @@ export function loading(loadingName?: string) {
           });
         });
       }
+      return ret;
     };
   };
 }
@@ -88,7 +89,17 @@ export default class Store {
       >((set) => {
         const ret: any = new Clazz(set);
         loopPrototype(ret, (key, proto) => {
-          (ret as any)[key] = (proto as any)[key];
+          const descriptor = Object.getOwnPropertyDescriptor(proto, key);
+          if (!descriptor?.get) {
+            (ret as any)[key] = (proto as any)[key];
+          } else {
+            Object.defineProperty(ret, key, {
+              enumerable: true,
+              get() {
+                return descriptor.get!.call(this);
+              },
+            });
+          }
         });
         return ret;
       }),
@@ -101,24 +112,20 @@ function loopPrototype<T extends object>(
   callback: (key: string, proto: T) => void,
 ) {
   const p: string[] = [];
-  for (
-    ;
-    obj != null && obj !== Store.prototype;
-    obj = Object.getPrototypeOf(obj)
-  ) {
-    const op = Object.getOwnPropertyNames(obj);
+  let proto = obj;
+  while (proto != null) {
+    proto = Object.getPrototypeOf(proto);
+    if (proto == null) {
+      break;
+    }
+    const op = Object.getOwnPropertyNames(proto);
     for (let i = 0; i < op.length; i++) {
       if (p.indexOf(op[i]) === -1) {
-        callback(op[i], obj);
+        callback(op[i], proto);
       }
+    }
+    if (proto === BaseStore.prototype) {
+      break;
     }
   }
 }
-
-// export const useStore = Store.create(class A extends BaseStore<A> {})
-
-// class User extends Store.BaseStore<User> {
-//   getName(){
-
-//   }
-// }
