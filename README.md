@@ -2,7 +2,7 @@
 
 [![NPM](https://img.shields.io/npm/v/zustand-store.svg)](https://www.npmjs.com/package/zustand-store) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
-基于 zustand 封装的 `Store` 方案，支持 `class` 写法。
+A zustand store with immer, which makes zustand support class pattern.
 
 ## Install
 
