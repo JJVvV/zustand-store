@@ -4,10 +4,6 @@ declare type StoreImmer<S> = S extends {
     getState: () => infer T;
     setState: infer SetState;
 } ? SetState extends (...a: any[]) => infer Sr ? (nextStateOrUpdater: T | Partial<T> | ((state: Draft<T>) => void), shouldReplace?: boolean | undefined) => Sr : never : never;
-/**
- * loading 装饰器
- * @param loadingName 自定义 loading key => store.loading[loadingName]
- */
 export declare function loading(loadingName?: string): (_: any, propertyKey: string, descriptor: PropertyDescriptor) => void;
 export declare class BaseStore<T extends object = any> {
     set: StoreImmer<{

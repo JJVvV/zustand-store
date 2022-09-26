@@ -17,10 +17,6 @@ exports.BaseStore = exports.loading = void 0;
 var zustand_1 = __importDefault(require("zustand"));
 var immer_1 = require("zustand/middleware/immer");
 var immer_2 = require("immer");
-/**
- * loading 装饰器
- * @param loadingName 自定义 loading key => store.loading[loadingName]
- */
 function loading(loadingName) {
     return function (_, propertyKey, descriptor) {
         var original = descriptor.value;
@@ -47,7 +43,7 @@ function loading(loadingName) {
     };
 }
 exports.loading = loading;
-var BaseStore = /** @class */ (function () {
+var BaseStore = (function () {
     function BaseStore(set) {
         this[_a] = true;
         this.set = set;
@@ -57,7 +53,7 @@ var BaseStore = /** @class */ (function () {
 }());
 exports.BaseStore = BaseStore;
 _a = immer_2.immerable;
-var Store = /** @class */ (function () {
+var Store = (function () {
     function Store() {
     }
     Store.create = function (Clazz) {
@@ -93,10 +89,12 @@ function loopPrototype(obj, callback) {
         if (proto == null) {
             break;
         }
-        var op = Object.getOwnPropertyNames(proto);
-        for (var i = 0; i < op.length; i++) {
-            if (p.indexOf(op[i]) === -1) {
-                callback(op[i], proto);
+        var protoKeys = Object.getOwnPropertyNames(proto);
+        var protoSymbols = Object.getOwnPropertySymbols(proto);
+        var keys = __spreadArray(__spreadArray([], protoKeys, true), protoSymbols, true);
+        for (var i = 0; i < keys.length; i++) {
+            if (p.indexOf(keys[i]) === -1) {
+                callback(keys[i], proto);
             }
         }
         if (proto === BaseStore.prototype) {

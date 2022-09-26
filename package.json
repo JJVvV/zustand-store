@@ -1,13 +1,8 @@
 {
   "name": "zustand-store",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "zustand store",
   "main": "dist/index.js",
-  "bin": {
-    "yl": "./build/src/index.js",
-    "yunlu": "./build/src/index.js",
-    "cloudlu": "./build/src/index.js"
-  },
   "scripts": {
     "start": "node build/src/index.js",
     "clean": "rimraf coverage build tmp",
