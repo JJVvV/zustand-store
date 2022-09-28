@@ -44,9 +44,10 @@ function loading(loadingName) {
 }
 exports.loading = loading;
 var BaseStore = (function () {
-    function BaseStore(set) {
+    function BaseStore(set, get) {
         this[_a] = true;
         this.set = set;
+        this.get = get;
         this.loading = {};
     }
     return BaseStore;
@@ -57,24 +58,42 @@ var Store = (function () {
     function Store() {
     }
     Store.create = function (Clazz) {
-        return (0, zustand_1.default)((0, immer_1.immer)(function (set) {
-            var ret = new Clazz(set);
+        var realRet = (0, zustand_1.default)((0, immer_1.immer)(function (set, get) {
+            var ret = new Clazz(set, get);
             loopPrototype(ret, function (key, proto) {
                 var descriptor = Object.getOwnPropertyDescriptor(proto, key);
                 if (!(descriptor === null || descriptor === void 0 ? void 0 : descriptor.get)) {
-                    ret[key] = proto[key];
+                    if (typeof proto[key] === 'function') {
+                        ret[key] = function () {
+                            var _b;
+                            var args = [];
+                            for (var _i = 0; _i < arguments.length; _i++) {
+                                args[_i] = arguments[_i];
+                            }
+                            return (_b = proto[key]).call.apply(_b, __spreadArray([realRet.getState()], args, false));
+                        };
+                    }
+                    else {
+                        Object.defineProperty(ret, key, {
+                            enumerable: true,
+                            get: function () {
+                                return realRet.getState()[key];
+                            },
+                        });
+                    }
                 }
                 else {
                     Object.defineProperty(ret, key, {
                         enumerable: true,
                         get: function () {
-                            return descriptor.get.call(this);
+                            return descriptor.get.call(realRet.getState());
                         },
                     });
                 }
             });
             return ret;
         }));
+        return realRet;
     };
     Store.BaseStore = BaseStore;
     Store.loading = loading;
@@ -89,12 +108,10 @@ function loopPrototype(obj, callback) {
         if (proto == null) {
             break;
         }
-        var protoKeys = Object.getOwnPropertyNames(proto);
-        var protoSymbols = Object.getOwnPropertySymbols(proto);
-        var keys = __spreadArray(__spreadArray([], protoKeys, true), protoSymbols, true);
-        for (var i = 0; i < keys.length; i++) {
-            if (p.indexOf(keys[i]) === -1) {
-                callback(keys[i], proto);
+        var op = Object.getOwnPropertyNames(proto);
+        for (var i = 0; i < op.length; i++) {
+            if (p.indexOf(op[i]) === -1) {
+                callback(op[i], proto);
             }
         }
         if (proto === BaseStore.prototype) {

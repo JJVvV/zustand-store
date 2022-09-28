@@ -50,6 +50,7 @@ export class BaseStore<T extends object = any> {
     getState(): T;
     setState(): T;
   }>;
+  get: () => T;
 
   loading: { [key: string]: boolean };
   [immerable] = true;
@@ -58,8 +59,10 @@ export class BaseStore<T extends object = any> {
       getState(): T;
       setState(): T;
     }>,
+    get: () => T,
   ) {
     this.set = set;
+    this.get = get;
     this.loading = {};
   }
 }
@@ -73,8 +76,10 @@ type LoadingKeys<T extends object> = Exclude<FilterPromiseKeys<T>, 'set'>;
 export default class Store {
   static BaseStore = BaseStore;
   static loading = loading;
-  static create<T extends new (set: any) => BaseStore<any>>(Clazz: T) {
-    return create(
+  static create<T extends new (set: any, get: any) => BaseStore<any>>(
+    Clazz: T,
+  ) {
+    const realRet = create(
       immer<
         InstanceType<T> & {
           loading: {
@@ -86,17 +91,28 @@ export default class Store {
             setState(): InstanceType<T>;
           }>;
         }
-      >((set) => {
-        const ret: any = new Clazz(set);
+      >((set, get) => {
+        const ret: any = new Clazz(set, get);
         loopPrototype(ret, (key, proto) => {
           const descriptor = Object.getOwnPropertyDescriptor(proto, key);
           if (!descriptor?.get) {
-            (ret as any)[key] = (proto as any)[key];
+            if (typeof (proto as any)[key] === 'function') {
+              (ret as any)[key] = function (...args: unknown[]) {
+                return (proto as any)[key].call(realRet.getState(), ...args);
+              };
+            } else {
+              Object.defineProperty(ret, key, {
+                enumerable: true,
+                get() {
+                  return (realRet.getState() as any)[key];
+                },
+              });
+            }
           } else {
             Object.defineProperty(ret, key, {
               enumerable: true,
               get() {
-                return descriptor.get!.call(this);
+                return descriptor.get!.call(realRet.getState());
               },
             });
           }
@@ -104,26 +120,25 @@ export default class Store {
         return ret;
       }),
     );
+    return realRet;
   }
 }
 
 function loopPrototype<T extends object>(
   obj: T,
-  callback: (key: string | symbol, proto: T) => void,
+  callback: (key: string, proto: T) => void,
 ) {
-  const p: Array<string | symbol> = [];
+  const p: string[] = [];
   let proto = obj;
   while (proto != null) {
     proto = Object.getPrototypeOf(proto);
     if (proto == null) {
       break;
     }
-    const protoKeys = Object.getOwnPropertyNames(proto);
-    const protoSymbols = Object.getOwnPropertySymbols(proto);
-    const keys = [...protoKeys, ...protoSymbols];
-    for (let i = 0; i < keys.length; i++) {
-      if (p.indexOf(keys[i]) === -1) {
-        callback(keys[i], proto);
+    const op = Object.getOwnPropertyNames(proto);
+    for (let i = 0; i < op.length; i++) {
+      if (p.indexOf(op[i]) === -1) {
+        callback(op[i], proto);
       }
     }
     if (proto === BaseStore.prototype) {

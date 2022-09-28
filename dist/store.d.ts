@@ -10,6 +10,7 @@ export declare class BaseStore<T extends object = any> {
         getState(): T;
         setState(): T;
     }>;
+    get: () => T;
     loading: {
         [key: string]: boolean;
     };
@@ -17,7 +18,7 @@ export declare class BaseStore<T extends object = any> {
     constructor(set: StoreImmer<{
         getState(): T;
         setState(): T;
-    }>);
+    }>, get: () => T);
 }
 declare type FilterPromiseKeys<T extends object> = {
     [K in keyof T]-?: T[K] extends (...args: any[]) => Promise<any> ? K : never;
@@ -26,7 +27,7 @@ declare type LoadingKeys<T extends object> = Exclude<FilterPromiseKeys<T>, 'set'
 export default class Store {
     static BaseStore: typeof BaseStore;
     static loading: typeof loading;
-    static create<T extends new (set: any) => BaseStore<any>>(Clazz: T): import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<InstanceType<T> & {
+    static create<T extends new (set: any, get: any) => BaseStore<any>>(Clazz: T): import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<InstanceType<T> & {
         loading: { [key in Exclude<FilterPromiseKeys<InstanceType<T>>, "set">]: boolean | undefined; };
         set: StoreImmer<{
             getState(): InstanceType<T>;
