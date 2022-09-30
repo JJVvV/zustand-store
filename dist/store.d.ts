@@ -1,5 +1,15 @@
+import * as zustand from 'zustand';
 import { immerable } from 'immer';
 import type { Draft } from 'immer';
+declare const createStore: {
+    <T, Mos extends ["zustand/immer", unknown][] = []>(initializer: zustand.StateCreator<T, [], Mos, T>): zustand.Mutate<zustand.StoreApi<T>, Mos>;
+    <T_1>(): <Mos_1 extends ["zustand/immer", unknown][] = []>(initializer: zustand.StateCreator<T_1, [], Mos_1, T_1>) => zustand.Mutate<zustand.StoreApi<T_1>, Mos_1>;
+}, create: {
+    <T, Mos extends ["zustand/immer", unknown][] = []>(initializer: zustand.StateCreator<T, [], Mos, T>): zustand.UseBoundStore<zustand.Mutate<zustand.StoreApi<T>, Mos>>;
+    <T_1>(): <Mos_1 extends ["zustand/immer", unknown][] = []>(initializer: zustand.StateCreator<T_1, [], Mos_1, T_1>) => zustand.UseBoundStore<zustand.Mutate<zustand.StoreApi<T_1>, Mos_1>>;
+    <S extends zustand.StoreApi<unknown>>(store: S): zustand.UseBoundStore<S>;
+}, useStore: typeof zustand.useStore;
+export { create, createStore, useStore };
 declare type StoreImmer<S> = S extends {
     getState: () => infer T;
     setState: infer SetState;
@@ -27,7 +37,7 @@ declare type LoadingKeys<T extends object> = Exclude<FilterPromiseKeys<T>, 'set'
 export default class Store {
     static BaseStore: typeof BaseStore;
     static loading: typeof loading;
-    static create<T extends new (set: any, get: any) => BaseStore<any>>(Clazz: T): import("zustand").UseBoundStore<Omit<import("zustand").StoreApi<InstanceType<T> & {
+    static create<T extends new (set: any, get: any) => BaseStore<any>>(Clazz: T): zustand.UseBoundStore<Omit<zustand.StoreApi<InstanceType<T> & {
         loading: { [key in Exclude<FilterPromiseKeys<InstanceType<T>>, "set">]: boolean | undefined; };
         set: StoreImmer<{
             getState(): InstanceType<T>;
@@ -55,4 +65,3 @@ export default class Store {
         }>) => void), shouldReplace?: boolean | undefined): void;
     }>;
 }
-export {};

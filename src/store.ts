@@ -1,8 +1,11 @@
-import create from 'zustand';
+import * as zustand from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { immerable } from 'immer';
 // eslint-disable-next-line no-unused-vars
 import type { Draft } from 'immer';
+
+const { createStore, default: create, useStore } = zustand;
+export { create, createStore, useStore };
 
 type StoreImmer<S> = S extends {
   getState: () => infer T;

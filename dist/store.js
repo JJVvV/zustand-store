@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
         if (ar || !(i in from)) {
@@ -8,15 +31,16 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BaseStore = exports.loading = void 0;
-var zustand_1 = __importDefault(require("zustand"));
+exports.BaseStore = exports.loading = exports.useStore = exports.createStore = exports.create = void 0;
+var zustand = __importStar(require("zustand"));
 var immer_1 = require("zustand/middleware/immer");
 var immer_2 = require("immer");
+var createStore = zustand.createStore, create = zustand.default, useStore = zustand.useStore;
+exports.createStore = createStore;
+exports.create = create;
+exports.useStore = useStore;
 function loading(loadingName) {
     return function (_, propertyKey, descriptor) {
         var original = descriptor.value;
@@ -58,7 +82,7 @@ var Store = (function () {
     function Store() {
     }
     Store.create = function (Clazz) {
-        var realRet = (0, zustand_1.default)((0, immer_1.immer)(function (set, get) {
+        var realRet = create((0, immer_1.immer)(function (set, get) {
             var ret = new Clazz(set, get);
             loopPrototype(ret, function (key, proto) {
                 var descriptor = Object.getOwnPropertyDescriptor(proto, key);
