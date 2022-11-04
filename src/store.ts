@@ -1,4 +1,5 @@
 import * as zustand from 'zustand';
+import shallow from 'zustand/shallow';
 import { immer } from 'zustand/middleware/immer';
 import { immerable } from 'immer';
 // eslint-disable-next-line no-unused-vars
@@ -123,7 +124,11 @@ export default class Store {
         return ret;
       }),
     );
-    return realRet;
+    const ret = function (a: any, b: any) {
+      return realRet(a, b || shallow);
+    };
+    Object.assign(ret, realRet);
+    return ret as typeof realRet;
   }
 }
 
