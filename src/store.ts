@@ -136,7 +136,7 @@ function loopPrototype<T extends object>(
   obj: T,
   callback: (key: string, proto: T) => void,
 ) {
-  const p: string[] = [];
+  const p = new Set<string>();
   let proto = obj;
   while (proto != null) {
     proto = Object.getPrototypeOf(proto);
@@ -145,7 +145,8 @@ function loopPrototype<T extends object>(
     }
     const op = Object.getOwnPropertyNames(proto);
     for (let i = 0; i < op.length; i++) {
-      if (p.indexOf(op[i]) === -1) {
+      if (!p.has(op[i])) {
+        p.add(op[i]);
         callback(op[i], proto);
       }
     }
